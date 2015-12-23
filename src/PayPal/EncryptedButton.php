@@ -158,7 +158,7 @@ class EncryptedButton
     fclose($out);
 
     // Sign our clear text file
-    if (!openssl_pkcs7_sign($clear_file, $signed_file, $this->public_cert, $this->private_key, [], PKCS7_BINARY)) {
+    if (!openssl_pkcs7_sign($clear_file, $signed_file, $this->public_cert, $this->private_key, array(), PKCS7_BINARY)) {
       throw new SecurityException('Unable to sign file');
     }
 
@@ -171,7 +171,7 @@ class EncryptedButton
     fclose($out);
 
     // Encrypt our signed file
-    if (!openssl_pkcs7_encrypt($signed_file, $encrypted_file, $this->paypal_cert, [], PKCS7_BINARY)) {
+    if (!openssl_pkcs7_encrypt($signed_file, $encrypted_file, $this->paypal_cert, array(), PKCS7_BINARY)) {
       throw new SecurityException('Unable to encrypt file');
     }
 
