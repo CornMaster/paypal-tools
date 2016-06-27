@@ -26,12 +26,15 @@ PDT Requests
 
 ```php
 <?php
-$pdt = new PayPal\PdtRequest($paypal_pdt_token);
+//$paypal_pdt_token - From PayPal when enabling PDT
+// $tx - from PayPal when returning from a sale.  Usually $_GET['tx']
+$pdt = new PayPal\PdtRequest($paypal_pdt_token,$tx);
 $pdt->set_timeout(5);
-$pdt->allow_sandbox(true);
+$pdt->enable_sandbox(true);
 
 $pdt->process(function($transaction_data) {
   // Show the user a receipt
+  // $transaction_data - holds all of the values back from PayPal about the transaction.
 }, function() {
   // Validation failed, show the user an error message or pull their receipt
   // from your database. Validation will fail after 3-5 successful verification
@@ -44,13 +47,20 @@ PayPal Buttons
 
 ```php
 <?php
+// $your_public_cert, $your_private_key - Contents of your public cert that you upload to PayPal, 
+// and your private key that you retain.
+// $paypal_cert_id - The ID assigned to your cert after you upload it.
+// $paypal_public_cert - Download from the PayPal site when you upload your cert.
+// Useful links about this:
+// Can be generated via instructions here: https://www.stellarwebsolutions.com/en/articles/paypal_button_encryption_php.php
+// Also Useful: https://developer.paypal.com/docs/classic/paypal-payments-standard/integration-guide/encryptedwebpayments/
 $button = new PayPal\EncryptedButton;
 $button->set_certificate($your_public_cert, $your_private_key);
 $button->set_certificate_id($paypal_cert_id);
 $button->set_paypal_cert($paypal_public_cert);
 $encrypted_text = $button->encrypt([
   'cmd'           => '_xclick',
-  'business'      => 'brandon.wamboldt@gmail.com',
+  'business'      => '{your business ID or Email Address}',
   'lc'            => 'CA',
   'currency_code' => 'CAD',
   'no_shipping'   => '1',
@@ -60,10 +70,19 @@ $encrypted_text = $button->encrypt([
   'amount'        => '123.45',
   'quantity'      => '1',
   'item_number'   => 'AWESOME-ITM-01',
-  'tax'           => '0.00'
+  'tax'           => '0.00',
+  'cancel_return' => 'URL to cancel'
 ]);
 ?>
 <form method="post" action="https://www.paypal.com/cgi-bin/webscr">
+  <input type="hidden" name="cmd" value="<?= $button->get_cmd() ?>">
+  <input type="hidden" name="encrypted" value="<?= $encrypted_text ?>">
+  <input type="submit" value="Checkout">
+</form>
+
+- OR - 
+
+<form method="post" action="https://www.sandbox.paypal.com/cgi-bin/webscr">
   <input type="hidden" name="cmd" value="<?= $button->get_cmd() ?>">
   <input type="hidden" name="encrypted" value="<?= $encrypted_text ?>">
   <input type="submit" value="Checkout">
