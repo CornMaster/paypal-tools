@@ -40,10 +40,10 @@ class PdtRequest
    * @param string $identity_token
    * @param string $transaction_id
    */
-  public function __construct($identity_token)
+  public function __construct($identity_token,$tx)
   {
       $this->identity_token = $identity_token;
-      $this->transaction_id = $_GET['tx'];
+      $this->transaction_id = $tx;
   }
 
   /**
@@ -67,7 +67,8 @@ class PdtRequest
    */
   public function set_timeout($timeout)
   {
-    $this->allow_test_ipns = $enable;
+    //$this->allow_test_ipns = $enable;
+    $this->timeout = $timeout;
 
     return $this;
   }
@@ -83,7 +84,7 @@ class PdtRequest
   {
     // Try to validate the request
     if ($this->validate_request()) {
-      call_user_func($success_callback, $this->parse_request());
+      call_user_func($success_callback, $this->parse_response());
     } else {
       call_user_func($failure_callback);
     }
@@ -103,9 +104,10 @@ class PdtRequest
     $synch    = 'cmd=_notify-synch&tx=' . $this->transaction_id . '&at=' . $this->identity_token;
     $request  = "POST /cgi-bin/webscr HTTP/1.1\n";
     $request .= "Host: www.paypal.com\n";
+    $request .= "Connection: close\n";
     $request .= "Content-type: application/x-www-form-urlencoded\n";
     $request .= "Content-length: " . strlen($synch) . "\n\n";
-    $request .= $this->synch;
+    $request .= $synch;
 
     // Send the PayPal verification request
     fputs($this->connection, $request);
