@@ -26,7 +26,7 @@ PDT Requests
 
 ```php
 <?php
-//$paypal_pdt_token - From PayPal when enabling PDT
+// $paypal_pdt_token - From PayPal when enabling PDT
 // $tx - from PayPal when returning from a sale.  Usually $_GET['tx']
 $pdt = new PayPal\PdtRequest($paypal_pdt_token,$tx);
 $pdt->set_timeout(5);

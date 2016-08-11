@@ -46,7 +46,7 @@ class IpnRequest
    */
   public function set_timeout($timeout)
   {
-    $this->allow_test_ipns = $enable;
+    $this->timeout = $timeout;
 
     return $this;
   }
